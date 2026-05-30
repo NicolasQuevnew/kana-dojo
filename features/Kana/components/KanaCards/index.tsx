@@ -3,10 +3,10 @@ import { Fragment, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import Subset from './Subset';
 import KanaRowCard from './KanaRowCard';
-import KanaUnitSelector, { type KanaType } from './KanaUnitSelector';
+import type { KanaType } from './KanaUnitSelector';
 import { kana } from '@/features/Kana/data/kana';
 import { useClick } from '@/shared/hooks/generic/useAudio';
-import { useMenuSelectorStore } from '@/shared/ui-composite/Menu/store/useMenuSelectorStore';
+
 import { cardBorderStyles } from '@/shared/utils/styles';
 import { ChevronUp } from 'lucide-react';
 
@@ -117,28 +117,18 @@ const saveToSessionStorage = (storageKey: string, hiddenSubsets: string[]) => {
 interface KanaCardsProps {
   filter?: KanaCardsFilter;
   viewMode: 'full' | 'compact';
+  selectedKanaType?: KanaType;
+  selectedSubset?: string;
 }
 
-const KanaCards = ({ filter = 'all', viewMode }: KanaCardsProps) => {
+const KanaCards = ({ filter = 'all', viewMode, selectedKanaType, selectedSubset }: KanaCardsProps) => {
   const { playClick } = useClick();
-  const persistedKanaSelection = useMenuSelectorStore(state => state.kana);
-  const setPersistedKanaSelection = useMenuSelectorStore(
-    state => state.setKanaSelection,
-  );
-  const [fallbackFilterOverride, setFallbackFilterOverride] =
-    useState<KanaType>('hiragana');
-  const [fallbackSelectedSubset, setFallbackSelectedSubset] =
-    useState<string>('base');
-  const shouldUsePersistedSelection = filter === 'all' && viewMode === 'full';
-  const filterOverride = shouldUsePersistedSelection
-    ? persistedKanaSelection.selected
-    : fallbackFilterOverride;
-  const selectedSubset = shouldUsePersistedSelection
-    ? persistedKanaSelection.selectedSubset
-    : fallbackSelectedSubset;
 
   const effectiveFilter: KanaCardsFilter =
-    USE_NEW_KANA_ROW_DESIGN && filter === 'all' ? filterOverride : filter;
+    USE_NEW_KANA_ROW_DESIGN && filter === 'all' && selectedKanaType
+      ? selectedKanaType
+      : filter;
+  const currentSubset = selectedSubset ?? 'base';
 
   const filteredGroups = kanaGroups.filter(group => {
     if (effectiveFilter === 'hiragana') {
@@ -202,7 +192,7 @@ const KanaCards = ({ filter = 'all', viewMode }: KanaCardsProps) => {
     })
     .filter(subset => {
       const subsetId = subset.name.slice(1).toLowerCase().split(' ')[0];
-      return subsetId === selectedSubset;
+      return subsetId === currentSubset;
     });
 
   const allKanaRowCards = useMemo(() => {
@@ -220,35 +210,6 @@ const KanaCards = ({ filter = 'all', viewMode }: KanaCardsProps) => {
     if (viewMode === 'full') {
       return (
         <div className='flex w-full flex-col gap-4'>
-          <KanaUnitSelector
-            selected={filterOverride}
-            onSelect={type => {
-              if (shouldUsePersistedSelection) {
-                const savedSubset =
-                  persistedKanaSelection.selectedSubsetByUnit[type];
-                setPersistedKanaSelection({
-                  selected: type,
-                  selectedSubset: savedSubset ?? 'base',
-                });
-                return;
-              }
-
-              setFallbackFilterOverride(type);
-              setFallbackSelectedSubset('base');
-            }}
-            selectedSubset={selectedSubset}
-            onSubsetSelect={subset => {
-              if (shouldUsePersistedSelection) {
-                setPersistedKanaSelection({
-                  selected: filterOverride,
-                  selectedSubset: subset,
-                });
-                return;
-              }
-
-              setFallbackSelectedSubset(subset);
-            }}
-          />
           <div className='grid w-full grid-cols-1 items-start gap-4 md:grid-cols-2 2xl:grid-cols-3'>
             {allKanaRowCards.map(card => (
               <KanaRowCard

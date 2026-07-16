@@ -194,7 +194,7 @@
   {
     "id": "coastal-shrine",
     "backgroundColor": "oklch(20.0% 0.040 235.0 / 1)",
-    "mainColor": "oklch(78.0% 0.205 35.0 / 1)']",
+    "mainColor": "oklch(78.0% 0.205 35.0 / 1)]",
     "secondaryColor": "oklch(88.0% 0.065 210.0 / 1)"
   },
   {
@@ -454,4 +454,10 @@
   "backgroundColor": "oklch(88.0% 0.030 340.0 / 1)",
   "mainColor": "oklch(55.0% 0.170 350.0 / 1)",
   "secondaryColor": "oklch(35.0% 0.020 260.0 / 1)"
+},
+  {
+  "id": "ocean-tofu",
+  "backgroundColor": "oklch(21.0% 0.042 235.0 / 1)",
+  "mainColor": "oklch(92.0% 0.025 240.0 / 1)",
+  "secondaryColor": "oklch(70.0% 0.135 225.0 / 1)"
 },
